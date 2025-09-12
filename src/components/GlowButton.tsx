@@ -14,30 +14,27 @@ type Props = HTMLMotionProps<'a'> & {
   children: React.ReactNode;
 };
 
-/**
- * Gradient-outline button with hover glow (driven by mouse pos).
- * Expects CSS using --mx / --my vars (already in your globals.css).
- */
 export default function GlowButton({ className, children, onMouseMove, ...props }: Props) {
-  // numeric motion values (no units)
-  const mx = useMotionValue(50); // %
+  // numeric motion values
+  const mx = useMotionValue(50); // percentage (0..100)
   const my = useMotionValue(30); // px
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
-    mx.set(((e.clientX - r.left) / r.width) * 100); // 0..100
-    my.set(e.clientY - r.top);                       // px
+    mx.set(((e.clientX - r.left) / r.width) * 100);
+    my.set(e.clientY - r.top);
     onMouseMove?.(e);
   };
 
-  // add units when binding to CSS
+  // add units for CSS
   const cssMx = useMotionTemplate`${mx}%`;
   const cssMy = useMotionTemplate`${my}px`;
 
+  // Cast the custom CSS variables so TS is happy.
   const style = {
-    '--mx': cssMx,
-    '--my': cssMy,
-  } as React.CSSProperties & Record<'--mx' | '--my', string>;
+    ['--mx' as any]: cssMx,
+    ['--my' as any]: cssMy,
+  } as any;
 
   return (
     <motion.a
