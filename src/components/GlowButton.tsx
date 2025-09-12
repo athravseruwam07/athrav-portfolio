@@ -1,26 +1,47 @@
 'use client';
-import { motion, useMotionValue } from 'framer-motion';
-import { cn } from '@/lib/utils';
 
-export function GlowButton({ children, href, className }: { children: React.ReactNode; href: string; className?: string }) {
-  const mx = useMotionValue(0); const my = useMotionValue(0);
+import * as React from 'react';
+import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+import clsx from 'clsx';
+
+type Props = React.ComponentProps<'a'> & {
+  className?: string;
+  children: React.ReactNode;
+};
+
+/**
+ * Gradient-outline button with hover glow driven by mouse position.
+ * Use CSS vars --mx / --my inside your globals.css to position the glow.
+ */
+export default function GlowButton({ className, children, onMouseMove, ...props }: Props) {
+  // numeric motion values (no units here)
+  const mx = useMotionValue(50); // percent across the button
+  const my = useMotionValue(30); // pixels from top
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const r = e.currentTarget.getBoundingClientRect();
+    // set numbers ONLY
+    mx.set(((e.clientX - r.left) / r.width) * 100); // 0..100
+    my.set(e.clientY - r.top);                       // px inside element
+    onMouseMove?.(e);
+  };
+
+  // convert to CSS custom props WITH units
+  const cssMx = useMotionTemplate`${mx}%`;
+  const cssMy = useMotionTemplate`${my}px`;
+
   return (
     <motion.a
-      href={href}
-      onMouseMove={(e) => {
-        const r = (e.currentTarget as HTMLAnchorElement).getBoundingClientRect();
-        mx.set(((e.clientX - r.left) / r.width) * 100 + '%');
-        my.set(((e.clientTarget as any)?.clientY ?? e.clientY) - r.top + 'px');
-      }}
-      style={{ '--mx': mx as any, '--my': my as any } as React.CSSProperties}
-      className={cn(
-        'relative inline-flex items-center justify-center rounded-xl2 px-5 py-3 font-medium text-white',
-        'bg-gradient-to-r from-neon-from via-neon-via to-neon-to',
-        'shadow-[0_8px_30px_rgb(0,0,0,0.25)] transition-transform duration-200 hover:scale-[1.02]',
-        'after:absolute after:inset-0 after:rounded-xl2 after:bg-white/0 after:pointer-events-none',
+      {...props}
+      onMouseMove={handleMouseMove}
+      style={{ '--mx': cssMx as unknown as string, '--my': cssMy as unknown as string } as React.CSSProperties}
+      className={clsx(
+        'btn-gradient-outline group inline-flex h-12 min-w-[210px] items-center justify-center px-6 text-white',
         className
       )}
     >
+      {/* moving sheen band */}
+      <span className="btn-shine" />
       {children}
     </motion.a>
   );
