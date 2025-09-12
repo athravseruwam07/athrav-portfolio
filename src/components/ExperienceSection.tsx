@@ -43,7 +43,7 @@ function Card({ xp }: { xp: ExperienceItem }) {
     el.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`);
     el.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`);
   };
-  const showLocation = xp.location?.trim().length > 0;
+  const showLocation = Boolean((xp.location ?? '').trim());
 
   return (
     <motion.article
