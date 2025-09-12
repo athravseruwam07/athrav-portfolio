@@ -9,7 +9,7 @@ import { ProjectCard } from '@/components/ProjectCard';
 import { SkillBadge } from '@/components/SkillBadge';
 import { ExperienceSection } from '@/components/ExperienceSection';
 import { EducationCard, type Education } from '@/components/EducationCard';
-import { Overview } from '@/components/Overview';
+import { Overview } from '@/components';
 import { projects, skills, experience, socials } from '@/lib/data';
 import { Github, Linkedin, Mail } from 'lucide-react';
 
