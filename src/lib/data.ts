@@ -59,7 +59,7 @@ export const experience: ExperienceItem[] = [
   {
     role: 'Mechanical Designer Co-Op',
     company: 'Automha Americas',
-    dates: 'Oct 2024 – Sept 2025',
+    dates: 'Oct 2024 – Jan 2025',
     location: 'Oakville, ON',
     logo: '/logos/automha.svg',
     bullets: [
