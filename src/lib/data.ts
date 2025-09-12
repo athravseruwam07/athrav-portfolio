@@ -34,7 +34,7 @@ export const projects = [
       'Static Next.js 14 + TypeScript portfolio with clean sections, responsive cards, subtle motion, and a recruiting-friendly experience timeline.',
     tags: ['Next.js 14', 'TypeScript', 'Tailwind', 'Framer Motion', 'shadcn/ui'],
     image: '/projects/portfolio.png',
-    github: 'https://github.com/athravseruwam07/portfolio'
+    github: 'https://github.com/athravseruwam07/athrav-portfolio'
     // no demo here → Live Demo button won’t render
   }
 ];
