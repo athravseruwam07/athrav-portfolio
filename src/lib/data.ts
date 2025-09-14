@@ -13,8 +13,8 @@ export const projects = [
   {
     title: 'AI Flashcard Generator',
     description:
-      'Generate smart study decks from notes, PDFs, or pasted text. Embeddings + LLM prompts build concise Q/A cards, spaced-repetition friendly, with export to CSV/Anki.',
-    tags: ['Next.js 14', 'TypeScript', 'OpenAI/LLM', 'Tailwind', 'shadcn/ui'],
+      'Generate flashcards instantly from notes, PDFs, DOCX, PPTX, or pasted text. Powered by LLMs with automatic chunking, the app creates test-ready Q/A cards you can study inside the app or export to CSV/Anki.',
+    tags: ['Python', 'Streamlit', 'LLM', 'Ollama/OpenAI'],
     image: '/projects/ai-flashcards.png',
     github: 'https://github.com/athravseruwam07/ai-flashcard-generator',
     demo: 'https://demo.ai-flashcards.com' // fake link for now
