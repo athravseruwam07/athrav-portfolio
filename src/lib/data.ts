@@ -11,9 +11,9 @@ export const socials = {
 
 export const projects = [
   {
-    title: 'AI Flashcard Generator',
+    title: 'FlashcardGPT',
     description:
-      'Generate flashcards instantly from notes, PDFs, DOCX, PPTX, or pasted text. Powered by LLMs with automatic chunking, the app creates test-ready Q/A cards you can study inside the app or export to CSV/Anki.',
+      'Generate flashcards instantly from notes, PDFs, DOCX, PPTX, or pasted text. Powered by LLMs with automatic chunking, the app creates test-ready Q/A cards you can review in the Streamlit UI or export to CSV/Anki.',
     tags: ['Python', 'Streamlit', 'LLM', 'Ollama/OpenAI'],
     image: '/projects/ai-flashcards.png',
     github: 'https://github.com/athravseruwam07/ai-flashcard-generator',
@@ -22,8 +22,8 @@ export const projects = [
   {
     title: 'Daily Schedule Optimizer',
     description:
-      'Time-blocking web app that converts tasks into a daily schedule using a greedy algorithm. Priority sorting, automatic breaks/lunch blocks, overflow handling, and CSV/ICS export for calendar integration.',
-    tags: ['Next.js', 'TypeScript', 'Tailwind', 'Algorithms', 'ICS/CSV Export'],
+      'Time-blocking web app that converts tasks into a daily schedule using a greedy algorithm. Features include priority sorting, automatic breaks and lunch blocks, overflow handling, and CSV/ICS export for calendar integration.',
+    tags: ['Next.js', 'TypeScript', 'Tailwind', 'Framer Motion', 'Algorithms', 'ICS/CSV Export'],
     image: '/projects/schedule-optimizer.png',
     github: 'https://github.com/athravseruwam07/daily-schedule-optimizer',
     demo: 'https://daily-schedule-optimizer.vercel.app/'
