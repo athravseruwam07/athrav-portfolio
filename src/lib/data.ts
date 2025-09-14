@@ -26,7 +26,7 @@ export const projects = [
     tags: ['Next.js', 'TypeScript', 'Tailwind', 'Algorithms', 'ICS/CSV Export'],
     image: '/projects/schedule-optimizer.png',
     github: 'https://github.com/athravseruwam07/daily-schedule-optimizer',
-    demo: 'https://demo.schedule-optimizer.com' // fake link for now
+    demo: 'https://daily-schedule-optimizer.vercel.app/'
   },
   {
     title: 'Personal Portfolio Website',
