@@ -1,40 +1,60 @@
-import type { Config } from 'tailwindcss';
+import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ['class'],
-  content: ['./src/app/**/*.{ts,tsx}', './src/components/**/*.{ts,tsx}', './src/lib/**/*.{ts,tsx}'],
+  darkMode: ["class"],
+  content: [
+    "./src/app/**/*.{ts,tsx}",
+    "./src/components/**/*.{ts,tsx}",
+    "./src/lib/**/*.{ts,tsx}",
+  ],
   theme: {
     extend: {
       colors: {
-        bg: '#0b0c10',
-        surface: '#131422',
-        line: '#1f2033',
+        bg: "#0c0c0f",
+        surface: "#111114",
+        line: "#1f1f24",
+        accent: "#22d3ee",
         text: {
-          base: '#e5e7eb',
-          muted: '#9ca3af',
+          base: "#e6e6e6",
+          muted: "#8a8a92",
+          mono: "#5a5a63",
         },
-        neon: {
-          from: '#6366f1', // indigo
-          via: '#8b5cf6',  // violet
-          to:   '#ec4899', // pink
-        },
+      },
+      fontFamily: {
+        display: ["var(--font-display)", "sans-serif"],
+        sans: ["var(--font-geist-sans)", "sans-serif"],
+        mono: ["var(--font-geist-mono)", "monospace"],
       },
       boxShadow: {
-        soft: '0 10px 25px -10px rgba(0,0,0,0.35)',
-        glow: '0 0 0 0 rgba(99,102,241,0)',
+        "glow-cyan": "0 0 24px rgba(34,211,238,0.18)",
       },
       backgroundImage: {
-        'grid': 'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)',
-        'noise': "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100\" height=\"100\" viewBox=\"0 0 100 100\"><filter id=\"n\"><feTurbulence type=\"fractalNoise\" baseFrequency=\"0.8\" numOctaves=\"4\" stitchTiles=\"stitch\"/></filter><rect width=\"100%\" height=\"100%\" filter=\"url(%23n)\" opacity=\"0.03\"/></svg>')",
+        dots: "radial-gradient(rgba(255,255,255,1) 1px, transparent 1px)",
       },
       backgroundSize: {
-        grid: '32px 32px',
-      },
-      borderRadius: {
-        xl2: '1.25rem',
+        dots: "24px 24px",
       },
       transitionTimingFunction: {
-        'out-quart': 'cubic-bezier(0.19, 1, 0.22, 1)',
+        snappy: "cubic-bezier(0.22, 0.61, 0.36, 1)",
+      },
+      keyframes: {
+        blink: {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0" },
+        },
+        shimmer: {
+          "0%": { backgroundPosition: "200% 0" },
+          "100%": { backgroundPosition: "-200% 0" },
+        },
+        spotlight: {
+          "0%": { opacity: "0", transform: "translate(-72%, -62%) scale(0.5)" },
+          "100%": { opacity: "1", transform: "translate(-50%, -40%) scale(1)" },
+        },
+      },
+      animation: {
+        blink: "blink 1.1s step-start infinite",
+        shimmer: "shimmer 3s linear infinite",
+        spotlight: "spotlight 2s ease .75s 1 forwards",
       },
     },
   },
