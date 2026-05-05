@@ -1,393 +1,469 @@
 'use client';
 
-import ContactSection from '@/components/ContactSection';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { Section } from '@/components/Section';
-import { ProjectCard } from '@/components/ProjectCard';
-import { SkillBadge } from '@/components/SkillBadge';
-import { ExperienceSection } from '@/components/ExperienceSection';
-import { EducationCard, type Education } from '@/components/EducationCard';
-import { Overview } from '@/components';
-import { projects, skills, experience, socials } from '@/lib/data';
-import { Github, Linkedin, Mail } from 'lucide-react';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import {
+  motion,
+  useScroll,
+  useSpring,
+  useTransform,
+  type Variants,
+} from 'framer-motion';
 
-const uw: Education = {
-  school: 'University of Waterloo',
-  program: 'BASc, Mechatronics Engineering',
-  dates: 'Sept 2025 – Apr 2030',
-  location: 'Waterloo, Ontario, Canada',
-  logo: '/logos/uwaterloo.png',
-  details:
-    'Relevant coursework: Programming (C++, OOP), Applied Math (Python, Linear Algebra), Engineering Design (AutoCAD, SolidWorks).',
+const NAV = [
+  { num: '01', label: 'Experience', href: '#experience' },
+  { num: '02', label: 'Projects', href: '#projects' },
+  { num: '03', label: 'Skills', href: '#skills' },
+  { num: '04', label: 'About', href: '#about' },
+  { num: '05', label: 'Education', href: '#education' },
+  { num: '06', label: 'Contact', href: '#contact' },
+];
+
+const PROJECTS = [
+  {
+    num: '01',
+    title: 'Dextera',
+    badge: 'ConHacks 2026 · 2nd Place',
+    desc: '<strong>Smart-glove rehab platform</strong> for stroke and hand-injury recovery. An <strong>ESP32</strong> streams live per-finger bend data from 5 flex sensors into a <strong>WebSocket</strong>-connected clinician dashboard. Patients complete guided rehab games that track reps, accuracy, and recovery progress over time.',
+    stack: ['ESP32', 'Next.js', 'TypeScript', 'WebSockets', 'Node.js', 'Hardware', 'CV'],
+    image: '/projects/dextera.png',
+    github: 'https://github.com/athravseruwam07/dextera',
+    demo: 'https://youtu.be/APtFJH6uppM',
+  },
+  {
+    num: '02',
+    title: 'Clarus',
+
+    desc: '<strong>AI academic copilot</strong> layered on D2L/Brightspace. Syncs your LMS through a <strong>Playwright</strong> connector and turns course data into a daily action plan with deadlines, priorities, and AI-generated study briefs.',
+    stack: ['Next.js', 'TypeScript', 'Tailwind', 'Playwright', 'LLMs'],
+    image: '/projects/clarus.png',
+    github: 'https://github.com/athravseruwam07/clarus',
+    demo: 'https://youtu.be/aM07UXQ1_XI',
+  },
+  {
+    num: '03',
+    title: 'Doceo',
+    desc: '<strong>AI STEM tutor</strong> that teaches any problem step-by-step on an animated whiteboard with <strong>Gemini</strong>-synced voice narration. Generates full lessons in 10 to 30 seconds, renders live equations, and lets students interrupt mid-lesson to ask questions.',
+    stack: ['Next.js', 'FastAPI', 'Gemini', 'TTS', 'Canvas'],
+    image: '/projects/doceo.png',
+    github: 'https://github.com/athravseruwam07/doceo',
+    demo: 'https://youtu.be/2ZF4wPcsDYA',
+  },
+];
+
+const EXPERIENCE = [
+  {
+    initials: 'QG',
+    logo: '/logos/quotograph.png',
+    period: 'Jan – Apr 2026',
+    role: 'Software Engineering Co-op',
+    where: 'Quotograph',
+    desc: 'Sole developer across three commercial construction-tech SaaS products. Built and shipped full-stack features end-to-end: <strong>AI-generated safety forms</strong>, a configurable <strong>approval and signature workflow</strong>, a <strong>Stripe billing and referral system</strong> across auth and payment microservices, and <strong>dual-model YOLO detection routing</strong> in the AI service. Led the <strong>AWS infrastructure migration</strong>, deploying PermitX to production on <strong>ECS, CloudFront, RDS, and S3</strong> with Bedrock as the AI provider.',
+  },
+  {
+    initials: 'FE',
+    logo: '/logos/uwfe.png',
+    period: 'Sep 2025 – Jan 2026',
+    role: 'Firmware Developer',
+    where: 'University of Waterloo Formula Electric',
+    desc: 'Developed and maintained <strong>embedded firmware</strong> enabling communication between <strong>ECUs</strong> and vehicle subsystems. Designed <strong>signal simulation frameworks</strong> to test ECU behavior under diverse voltage and input conditions. Collaborated with electrical and controls teams to diagnose and optimize signal pathways and contributed to control board validation.',
+  },
+  {
+    initials: 'AA',
+    logo: '/logos/automha.svg',
+    period: 'Oct 2024 – Jan 2025',
+    role: 'Mechanical Designer Co-op',
+    where: 'Automha Americas',
+    desc: 'Designed semi-automated <strong>warehouse layouts</strong> in <strong>AutoCAD</strong>, integrating racking and conveyance systems for industrial clients. Built <strong>Excel capacity models</strong> to drive layout decisions and supported engineers on live automation projects.',
+  },
+];
+
+const STACK = [
+  {
+    title: 'LANGUAGES',
+    items: ['Python', 'C++', 'Java', 'JavaScript', 'TypeScript', 'HTML / CSS'],
+  },
+  {
+    title: 'FRAMEWORKS & TOOLS',
+    items: ['React', 'Next.js', 'FastAPI', 'Tailwind CSS', 'Framer Motion', 'Stripe', 'YOLOv8', 'Git'],
+  },
+  {
+    title: 'CLOUD & INFRA',
+    items: ['AWS ECS', 'CloudFront', 'S3', 'RDS', 'Bedrock', 'Docker', 'PostgreSQL'],
+  },
+  {
+    title: 'ENGINEERING / CAD',
+    items: ['SolidWorks', 'Inventor', 'AutoCAD', 'Excel (modeling)'],
+  },
+];
+
+type Contact = { key: string; val: string; href: string; download?: boolean };
+
+const CONTACTS: Contact[] = [
+  { key: 'EMAIL', val: 'athravmk@gmail.com', href: 'mailto:athravmk@gmail.com' },
+  { key: 'GITHUB', val: 'github.com/athravseruwam07', href: 'https://github.com/athravseruwam07' },
+  { key: 'LINKEDIN', val: 'linkedin.com/in/a-seruwam', href: 'https://linkedin.com/in/a-seruwam/' },
+  { key: 'RESUME', val: 'download pdf', href: '/resume.pdf', download: true },
+];
+
+/* ---------------- motion variants ---------------- */
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+};
+const stagger: Variants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.06, delayChildren: 0.05 } },
+};
+const heroStagger: Variants = {
+  hidden: { opacity: 0 },
+  show: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } },
 };
 
-/* --------------------- simple typewriter --------------------- */
-function Typewriter({
-  words,
-  typingSpeed = 70,
-  eraseSpeed = 45,
-  hold = 1200,
-  blinkCycles = 3,
-  blinkMs = 220,
-}: {
-  words: string[];
-  typingSpeed?: number;
-  eraseSpeed?: number;
-  hold?: number;
-  blinkCycles?: number;
-  blinkMs?: number;
-}) {
-  const [i, setI] = useState(0);
-  const [text, setText] = useState('');
-  const [dir, setDir] = useState<'type' | 'blink' | 'erase'>('type');
-  const [blinks, setBlinks] = useState(0);
-  const [cursorOn, setCursorOn] = useState(true);
-  const mounted = useRef(true);
-
-  const maxLen = useMemo(() => Math.max(...words.map(w => w.length)), [words]);
-  const current = useMemo(() => words[i % words.length], [i, words]);
-
-  useEffect(() => {
-    mounted.current = true;
-    return () => { mounted.current = false; };
-  }, []);
-
-  useEffect(() => {
-    if (!mounted.current) return;
-    let t: number;
-
-    if (dir === 'type') {
-      if (text.length < current.length) {
-        t = window.setTimeout(() => setText(current.slice(0, text.length + 1)), typingSpeed);
-      } else {
-        setDir('blink'); setBlinks(0);
-      }
-    } else if (dir === 'blink') {
-      if (blinks < blinkCycles * 2) {
-        t = window.setTimeout(() => { setCursorOn(c => !c); setBlinks(b => b + 1); }, blinkMs);
-      } else {
-        setCursorOn(true);
-        t = window.setTimeout(() => setDir('erase'), hold);
-      }
-    } else {
-      if (text.length > 0) {
-        t = window.setTimeout(() => setText(current.slice(0, text.length - 1)), eraseSpeed);
-      } else {
-        setDir('type'); setI(p => (p + 1) % words.length);
-      }
-    }
-    return () => window.clearTimeout(t);
-  }, [text, dir, current, typingSpeed, eraseSpeed, hold, blinkCycles, blinkMs, blinks]);
-
+/* ---------------- GitHub SVG icon ------------------- */
+function GithubIcon() {
   return (
-    <span
-      className="inline-flex h-5 items-center gap-2 whitespace-nowrap leading-5"
-      style={{ minWidth: `calc(${maxLen}ch + 0.5rem)` }}
-    >
-      <span className="font-medium tracking-widest text-text-muted">{text}</span>
-      <span
-        className="inline-block h-5 w-[2px] bg-text-muted/70"
-        style={{ opacity: cursorOn ? 1 : 0 }}
-      />
-    </span>
+    <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+      <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+    </svg>
   );
 }
 
-/* ------------------ hero animations container ---------------- */
-const heroContainer = {
-  hidden: { opacity: 0 },
-  show: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.15 } },
-};
-const fadeUp = {
-  hidden: { opacity: 0, y: 18 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
-};
+/* ---------------- section wrapper with whileInView reveal --- */
+function Reveal({
+  children,
+  className,
+  id,
+  amount = 0.15,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  id?: string;
+  amount?: number;
+}) {
+  return (
+    <motion.section
+      id={id}
+      className={className}
+      variants={stagger}
+      initial="hidden"
+      whileInView="show"
+      viewport={{ once: true, amount }}
+    >
+      {children}
+    </motion.section>
+  );
+}
+
+/* ---------------- active section observer ------------------- */
+function useActiveSection(ids: string[]) {
+  const [active, setActive] = useState<string>(ids[0]);
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (visible) setActive(visible.target.id);
+      },
+      { rootMargin: '-40% 0px -50% 0px', threshold: [0, 0.25, 0.5, 0.75, 1] },
+    );
+    ids.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+    return () => observer.disconnect();
+  }, [ids]);
+  return active;
+}
 
 export default function HomePage() {
-  // Soft pointer-parallax for orbs
-  useEffect(() => {
-    const move = (e: MouseEvent) => {
-      const x = (e.clientX - window.innerWidth / 2) / (window.innerWidth / 2);
-      const y = (e.clientY - window.innerHeight / 2) / (window.innerHeight / 2);
-      document.documentElement.style.setProperty('--mx', String(x));
-      document.documentElement.style.setProperty('--my', String(y));
-    };
-    window.addEventListener('mousemove', move);
-    return () => window.removeEventListener('mousemove', move);
-  }, []);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 28, mass: 0.4 });
+  const heroY = useTransform(scrollYProgress, [0, 0.15], [0, -40]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0.6]);
+
+  const active = useActiveSection([
+    'hero',
+    'experience',
+    'projects',
+    'skills',
+    'about',
+    'education',
+    'contact',
+  ]);
 
   return (
     <>
-      {/* HERO */}
-      <section id="home" className="relative overflow-hidden">
-        <div
-          className="pointer-events-none absolute -top-24 -left-24 h-[40rem] w-[40rem] rounded-full bg-gradient-to-br from-neon-from via-neon-via to-neon-to opacity-20 hero-orb parallax-orb"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute -bottom-32 -right-24 h-[36rem] w-[36rem] rounded-full bg-gradient-to-br from-neon-to via-neon-via to-neon-from opacity-20 hero-orb parallax-orb-rev"
-          aria-hidden
-        />
+      {/* scroll progress bar */}
+      <motion.div className="scroll-progress" style={{ scaleX: progress }} />
 
-        <motion.div
-          variants={heroContainer}
+      {/* NAV */}
+      <header className="nav">
+        <div className="nav-id">
+          <span className="status-dot" aria-hidden />
+          <span className="nav-prompt">~/athrav-seruwam</span>
+        </div>
+        <nav className="nav-mid">
+          {NAV.map((l) => {
+            const id = l.href.slice(1);
+            return (
+              <a
+                key={l.href}
+                href={l.href}
+                className={`nav-link${active === id ? ' is-active' : ''}`}
+              >
+                <span className="num">{l.num}</span>
+                <span>{l.label}</span>
+              </a>
+            );
+          })}
+        </nav>
+        <div className="nav-r">
+          <span>open to internships</span>
+        </div>
+      </header>
+
+      <main>
+        {/* HERO */}
+        <motion.section
+          className="hero"
+          id="hero"
+          variants={heroStagger}
           initial="hidden"
           animate="show"
-          className="mx-auto max-w-5xl px-6 pt-24 pb-28"
+          style={{ y: heroY, opacity: heroOpacity }}
         >
-          <motion.p variants={fadeUp} className="mb-1 h-5 text-sm uppercase tracking-widest text-text-muted">
-            <Typewriter
-              words={['Engineer', 'Problem Solver', 'Innovator']}
-              typingSpeed={70}
-              eraseSpeed={45}
-              hold={400}
-              blinkCycles={3}
-              blinkMs={220}
-            />
-          </motion.p>
+          <motion.div className="hero-meta" variants={fadeUp}>
+            <span><strong>Mechatronics Engineering</strong></span>
+            <span>·</span>
+            <span>University of Waterloo</span>
+            <span>·</span>
+            <span>Ontario, CA</span>
+          </motion.div>
 
-          <motion.h1 variants={fadeUp} className="mt-2 text-5xl font-extrabold leading-tight sm:text-6xl md:text-7xl">
-            Hi, I’m <span className="neon-text hover-underline">Athrav Seruwam</span>.
+          <motion.h1 className="hero-name" variants={fadeUp}>
+            Athrav Seruwam<span className="cursor" />
           </motion.h1>
 
-          <motion.p variants={fadeUp} className="mt-4 max-w-3xl text-lg text-text-muted">
-            Mechatronics Engineering @ UWaterloo. Applying engineering principles to design and build reliable software systems.
+          <motion.p className="hero-tag" variants={fadeUp}>
+            Applying engineering principles to design and build reliable software systems.
           </motion.p>
 
-          <motion.div variants={fadeUp} className="mt-8 flex flex-wrap items-center gap-4">
-            {/* View Projects */}
-            <a
-              href="#projects"
-              className="btn-filled group inline-flex h-12 min-w-[210px] items-center justify-center px-6 text-white"
-            >
-              <span className="btn-softglow" />
-              <span className="btn-sheen" />
-              View Projects
-            </a>
+          <motion.p className="hero-bio" variants={fadeUp}>
+            I build full-stack software and ship things end-to-end. I have done production work across web apps, AI pipelines, cloud infrastructure, and embedded systems.
+          </motion.p>
 
-            {/* Contact Me */}
-            <a
-              href="#contact"
-              className="btn-gradient-outline group inline-flex h-12 min-w-[210px] items-center justify-center px-6 text-white"
-            >
-              <span className="btn-shine" />
-              Contact Me
+          <motion.div className="hero-actions" variants={fadeUp}>
+            <a href="#experience" className="btn primary">
+              view work <span className="arrow">→</span>
+            </a>
+            <a href="/resume.pdf" download className="btn">
+              download resume
+            </a>
+            <a href="#contact" className="btn">
+              get in touch
             </a>
           </motion.div>
 
-          <motion.div variants={fadeUp} className="mt-8 flex items-center gap-2">
-            <Link
-              href={socials.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="LinkedIn"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-white transition hover:-translate-y-[1px] hover:border-neon-from focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-from"
-            >
-              <Linkedin className="h-5 w-5" />
-            </Link>
-            <Link
-              href={socials.github}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="GitHub"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-white transition hover:-translate-y-[1px] hover:border-neon-from focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-from"
-            >
-              <Github className="h-5 w-5" />
-            </Link>
-            <a
-              href={`mailto:${socials.email}`}
-              aria-label="Email"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line text-white transition hover:-translate-y-[1px] hover:border-neon-from focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-from"
-            >
-              <Mail className="h-5 w-5" />
-            </a>
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* ABOUT */}
-      <Overview />
-
-      {/* PROJECTS */}
-      <Section id="projects" title="Projects" spaceBottom="tight">
-        <div className="grid gap-6 sm:grid-cols-2">
-          {projects.map((p) => (
-            <ProjectCard key={p.title} project={p} />
-          ))}
-        </div>
-      </Section>
-
-      {/* SKILLS */}
-      <Section id="skills" title="Skills" spaceBottom="tight">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {skills.map((s) => (
-            <div key={s} className="flex justify-center">
-              <SkillBadge label={s} />
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      {/* EXPERIENCE */}
-      <Section id="experience" title="Experience" spaceTop="tight" spaceBottom="tight">
-        <ExperienceSection items={experience} />
-      </Section>
-
-      {/* EDUCATION */}
-      <Section id="education" title="Education" spaceBottom="tight">
-        <EducationCard edu={uw} />
-      </Section>
-
-      {/* CONTACT */}
-      <Section id="contact" title="Contact">
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Left card: quick actions with subtle sheen + glow */}
-          <div className="group relative rounded-2xl border border-line bg-surface/90 p-6 shadow-soft">
-            {/* sheen */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 -z-10 -translate-x-[140%] rounded-2xl
-                         bg-gradient-to-r from-transparent via-white/8 to-transparent opacity-0
-                         transition duration-700 ease-[cubic-bezier(.22,1,.36,1)]
-                         group-hover:translate-x-[140%] group-hover:opacity-100"
-            />
-            {/* ambient glow */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -inset-2 -z-20 rounded-3xl
-                         bg-gradient-to-tr from-neon-from/12 via-neon-via/10 to-neon-to/12
-                         opacity-0 blur-xl transition-opacity duration-300
-                         group-hover:opacity-100"
-            />
-
-            <h3 className="text-lg font-semibold text-white">Let’s Connect</h3>
-
-            <div className="mt-4 flex flex-wrap gap-3">
-              <a
-                href={`mailto:${socials.email}`}
-                className="inline-flex items-center gap-2 rounded-xl2 border border-white/12 bg-surface px-4 py-2 text-white
-                           transition hover:-translate-y-[1px] hover:border-neon-from/50
-                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-from"
-              >
-                <Mail className="h-4 w-4" />
-                Email
-              </a>
-
-              <Link
-                href={socials.linkedin}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl2 border border-white/12 bg-surface px-4 py-2 text-white
-                           transition hover:-translate-y-[1px] hover:border-neon-from/50
-                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-from"
-              >
-                <Linkedin className="h-4 w-4" />
-                LinkedIn
-              </Link>
-
-              <Link
-                href={socials.github}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl2 border border-white/12 bg-surface px-4 py-2 text-white
-                           transition hover:-translate-y-[1px] hover:border-neon-from/50
-                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-from"
-              >
-                <Github className="h-4 w-4" />
-                GitHub
-              </Link>
-            </div>
-
-            <p className="mt-4 text-sm text-text-muted">
-              Or use the form. It’s wired for static deployments via Formspree.
-            </p>
-          </div>
-
-          {/* Formspree form: focus glow + tiny character counter (no React state) */}
-          <form
-            className="group relative rounded-2xl border border-line bg-surface/90 p-6 shadow-soft"
-            action="https://formspree.io/f/xdklbqyl"
-            method="POST"
+          <motion.a
+            href="#experience"
+            className="scroll-cue"
+            aria-label="Scroll down"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.6 }}
+            style={{ opacity: heroOpacity }}
           >
-            {/* sheen */}
-            <span
-              aria-hidden
-              className="pointer-events-none absolute inset-0 -z-10 -translate-x-[140%] rounded-2xl
-                         bg-gradient-to-r from-transparent via-white/8 to-transparent opacity-0
-                         transition duration-700 ease-[cubic-bezier(.22,1,.36,1)]
-                         group-hover:translate-x-[140%] group-hover:opacity-100"
-            />
+            <span className="scroll-cue-label">scroll</span>
+            <span className="scroll-cue-track">
+              <span className="scroll-cue-dot" />
+            </span>
+          </motion.a>
+        </motion.section>
 
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-white">
-                Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                required
-                className="mt-1 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm text-white
-                           placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-from"
-                placeholder="Your name"
-              />
-            </div>
+        {/* EXPERIENCE */}
+        <Reveal id="experience">
+          <motion.div className="sec-head" variants={fadeUp}>
+            <span className="prompt">$</span>
+            <span className="cmd">cat</span>
+            <span className="arg">~/experience.log</span>
+            <span className="rule" />
+            <span className="count">{EXPERIENCE.length} entries</span>
+          </motion.div>
+          <div className="exp">
+            {EXPERIENCE.map((e) => (
+              <motion.article key={e.role} className="exp-row" variants={fadeUp}>
+                <div className={e.logo ? 'exp-logo-img-wrap' : 'exp-logo'}>
+                  {e.logo ? (
+                    <Image src={e.logo} alt={e.where} fill sizes="48px" style={{ objectFit: 'contain' }} />
+                  ) : (
+                    <span>{e.initials}</span>
+                  )}
+                </div>
+                <div className="exp-period">{e.period}</div>
+                <div className="exp-body">
+                  <h3>{e.role}</h3>
+                  <div className="where">{e.where}</div>
+                  <p dangerouslySetInnerHTML={{ __html: e.desc }} />
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </Reveal>
 
-            <div className="mt-4">
-              <label htmlFor="email" className="block text-sm font-medium text-white">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                className="mt-1 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm text-white
-                           placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-from"
-                placeholder="you@example.com"
-              />
-            </div>
+        {/* PROJECTS */}
+        <Reveal id="projects">
+          <motion.div className="sec-head" variants={fadeUp}>
+            <span className="prompt">$</span>
+            <span className="cmd">ls</span>
+            <span className="arg">~/projects</span>
+            <span className="rule" />
+            <span className="count">{PROJECTS.length} items</span>
+          </motion.div>
+          <div className="projects">
+            {PROJECTS.map((p) => (
+              <motion.article
+                key={p.title}
+                className="project"
+                variants={fadeUp}
+                whileHover={{ y: -2 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 26 }}
+              >
+                <div className="project-thumb">
+                  <Image
+                    src={p.image}
+                    alt={p.title}
+                    fill
+                    sizes="(max-width: 720px) 100vw, 200px"
+                  />
+                </div>
+                <div className="project-body">
+                  <div className="project-head">
+                    <h3 className="project-title">{p.title}</h3>
+                    <span className="project-num">{p.num}</span>
+                  </div>
+                  {p.badge && <div className="project-badge">★ {p.badge}</div>}
+                  <p className="project-desc" dangerouslySetInnerHTML={{ __html: p.desc }} />
+                  <div className="project-stack">
+                    {p.stack.map((s) => (
+                      <span key={s} className="chip">{s}</span>
+                    ))}
+                  </div>
+                  <div className="project-actions">
+                    <a href={p.demo} target="_blank" rel="noopener" className="pbtn demo">
+                      <span className="ic">▸</span> demo
+                    </a>
+                    <a href={p.github} target="_blank" rel="noopener" className="pbtn">
+                      <GithubIcon /> github
+                    </a>
+                  </div>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </Reveal>
 
-            <div className="mt-4">
-              <label htmlFor="message" className="block text-sm font-medium text-white">
-                Message
-              </label>
-
-              <div className="relative">
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={5}
-                  maxLength={1500}
-                  required
-                  className="mt-1 w-full rounded-xl border border-line bg-surface px-3 py-2 text-sm text-white
-                             placeholder:text-text-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-from"
-                  placeholder="How can I help?"
-                  onInput={(e) => {
-                    const el = e.currentTarget;
-                    const label = el.nextElementSibling as HTMLSpanElement | null;
-                    if (label) label.textContent = `${el.value.length}/1500`;
-                  }}
-                />
-                <span className="pointer-events-none absolute bottom-1 right-2 select-none text-[10px] text-text-muted/70">
-                  0/1500
-                </span>
+        {/* SKILLS */}
+        <Reveal id="skills">
+          <motion.div className="sec-head" variants={fadeUp}>
+            <span className="prompt">$</span>
+            <span className="cmd">cat</span>
+            <span className="arg">~/.stack</span>
+            <span className="rule" />
+            <span className="count">{STACK.length} groups</span>
+          </motion.div>
+          <motion.div className="stack-grid" variants={fadeUp}>
+            {STACK.map((g) => (
+              <div key={g.title} className="stack-col">
+                <h4>{g.title}</h4>
+                <ul>
+                  {g.items.map((it) => (
+                    <li key={it}>{it}</li>
+                  ))}
+                </ul>
               </div>
-            </div>
+            ))}
+          </motion.div>
+        </Reveal>
 
-            <button
-              type="submit"
-              className="mt-4 w-full rounded-xl2 border border-white/12 bg-surface px-4 py-2 text-white
-                         transition hover:-translate-y-[1px] hover:border-neon-from/50
-                         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neon-from"
-            >
-              Send
-            </button>
-            <p className="mt-2 text-xs text-text-muted">Powered by Formspree.</p>
-          </form>
-        </div>
-      </Section>
+        {/* ABOUT */}
+        <Reveal id="about" className="about">
+          <motion.div className="sec-head" variants={fadeUp}>
+            <span className="prompt">$</span>
+            <span className="cmd">whoami</span>
+            <span className="arg">--verbose</span>
+            <span className="rule" />
+            <span className="count" />
+          </motion.div>
+          <motion.div className="about-grid" variants={fadeUp}>
+            <div>
+              <p>I&apos;m a Mechatronics Engineering student at Waterloo. My co-op at Quotograph had me as the sole developer shipping production features across three SaaS products, which taught me how to own things end-to-end fast.</p>
+              <p>I build across the full stack: <strong>React and Next.js</strong> on the frontend, <strong>FastAPI and Node</strong> on the backend, <strong>PostgreSQL</strong> for data, and <strong>AWS</strong> for infrastructure. I also work on embedded systems through Formula Electric.</p>
+              <p>I am looking for a software engineering co-op where I can build real things, work on hard problems, and grow quickly.</p>
+            </div>
+            <dl className="about-side">
+              <div><dt>location</dt><dd>Ontario, Canada</dd></div>
+              <div><dt>school</dt><dd>UWaterloo &apos;30</dd></div>
+              <div><dt>program</dt><dd>Mechatronics Eng</dd></div>
+              <div><dt>status</dt><dd style={{ color: 'var(--accent)' }}>open to internships</dd></div>
+            </dl>
+          </motion.div>
+        </Reveal>
+
+        {/* EDUCATION */}
+        <Reveal id="education">
+          <motion.div className="sec-head" variants={fadeUp}>
+            <span className="prompt">$</span>
+            <span className="cmd">cat</span>
+            <span className="arg">~/education</span>
+            <span className="rule" />
+            <span className="count">1 entry</span>
+          </motion.div>
+          <motion.div className="edu" variants={fadeUp}>
+            <div className="edu-logo">
+              <Image src="/logos/uwaterloo.png" alt="University of Waterloo" fill sizes="48px" style={{ objectFit: 'contain', padding: '4px' }} />
+            </div>
+            <div>
+              <h3>University of Waterloo</h3>
+              <div className="deg">BASc · Mechatronics Engineering</div>
+              <p className="detail">Engineering fundamentals across mechanical, electrical, and software domains.</p>
+            </div>
+            <div className="edu-period">Sept 2025 — Apr 2030</div>
+          </motion.div>
+        </Reveal>
+
+        {/* CONTACT */}
+        <Reveal id="contact">
+          <motion.div className="sec-head" variants={fadeUp}>
+            <span className="prompt">$</span>
+            <span className="cmd">contact</span>
+            <span className="arg">--all</span>
+            <span className="rule" />
+            <span className="count">{CONTACTS.length} channels</span>
+          </motion.div>
+          <motion.div className="contact" variants={fadeUp}>
+            {CONTACTS.map((c) => (
+              <a
+                key={c.key}
+                href={c.href}
+                target={c.href.startsWith('http') ? '_blank' : undefined}
+                rel={c.href.startsWith('http') ? 'noopener' : undefined}
+                {...(c.download ? { download: '' } : {})}
+              >
+                <span className="key">{c.key}</span>
+                <span className="val">{c.val}</span>
+                <span className="arr">→</span>
+              </a>
+            ))}
+          </motion.div>
+        </Reveal>
+
+        <footer className="site-footer">
+          <span>$ built by athrav · 2026</span>
+          <span className="ok">● online</span>
+        </footer>
+      </main>
     </>
   );
 }
