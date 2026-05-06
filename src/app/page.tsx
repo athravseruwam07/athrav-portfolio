@@ -235,9 +235,7 @@ export default function HomePage() {
           style={{ y: heroY, opacity: heroOpacity }}
         >
           <motion.div className="hero-meta" variants={fadeUp}>
-            <span><strong>Mechatronics Engineering</strong></span>
-            <span>·</span>
-            <span>University of Waterloo</span>
+            <span><strong>Mechatronics Engineering @ University of Waterloo</strong></span>
             <span>·</span>
             <span>Ontario, CA</span>
           </motion.div>
