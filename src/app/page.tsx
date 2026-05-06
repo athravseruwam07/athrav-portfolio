@@ -57,7 +57,7 @@ const EXPERIENCE = [
     initials: 'QG',
     logo: '/logos/quotograph.png',
     period: 'Jan – Apr 2026',
-    role: 'Software Engineering Co-op',
+    role: 'Software Engineer Intern',
     where: 'Quotograph',
     desc: 'Sole developer across three commercial construction-tech SaaS products. Built and shipped full-stack features end-to-end: <strong>AI-generated safety forms</strong>, a configurable <strong>approval and signature workflow</strong>, a <strong>Stripe billing and referral system</strong> across auth and payment microservices, and <strong>dual-model YOLO detection routing</strong> in the AI service. Led the <strong>AWS infrastructure migration</strong>, deploying PermitX to production on <strong>ECS, CloudFront, RDS, and S3</strong> with Bedrock as the AI provider.',
   },
