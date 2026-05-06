@@ -19,6 +19,9 @@ const geist = Geist({
   display: 'swap',
 });
 
+const favicon = '/logos/as.png?v=20260506-transparent';
+const faviconIco = '/favicon.ico?v=20260506-transparent';
+
 export const metadata: Metadata = {
   title: 'Athrav Seruwam — Mechatronics Engineering @ Waterloo',
   description: 'Mechatronics Engineering @ Waterloo · Portfolio of Athrav Seruwam',
@@ -29,12 +32,23 @@ export const metadata: Metadata = {
     type: 'website',
     url: 'https://example.com',
   },
-  icons: { icon: '/logos/as.png' },
+  icons: {
+    icon: [
+      { url: favicon, type: 'image/png', sizes: '1254x1254' },
+      { url: faviconIco, type: 'image/x-icon', sizes: '16x16 32x32 48x48 64x64' },
+    ],
+    shortcut: [{ url: faviconIco, type: 'image/x-icon', sizes: '16x16 32x32 48x48 64x64' }],
+    apple: [{ url: favicon, type: 'image/png', sizes: '1254x1254' }],
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geist.variable} ${jetbrains.variable}`}>
+    <html
+      lang="en"
+      className={`${geist.variable} ${jetbrains.variable}`}
+      suppressHydrationWarning
+    >
       <body suppressHydrationWarning>{children}</body>
     </html>
   );
