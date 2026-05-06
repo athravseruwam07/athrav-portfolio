@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import {
   motion,
+  AnimatePresence,
   useScroll,
   useSpring,
   useTransform,
@@ -183,6 +184,17 @@ export default function HomePage() {
   const heroY = useTransform(scrollYProgress, [0, 0.15], [0, -40]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.18], [1, 0.6]);
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false); };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, []);
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [menuOpen]);
+
   const active = useActiveSection([
     'hero',
     'experience',
@@ -222,7 +234,40 @@ export default function HomePage() {
         <div className="nav-r">
           <span>open to internships</span>
         </div>
+        <button
+          className={`nav-burger${menuOpen ? ' is-open' : ''}`}
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label="Toggle menu"
+          aria-expanded={menuOpen}
+        >
+          <span /><span /><span />
+        </button>
       </header>
+
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            className="mobile-menu"
+            key="mobile-menu"
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18 }}
+          >
+            {NAV.map((l) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className="mobile-menu-link"
+                onClick={() => setMenuOpen(false)}
+              >
+                <span className="num">{l.num}</span>
+                <span>{l.label}</span>
+              </a>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <main>
         {/* HERO */}
@@ -236,7 +281,7 @@ export default function HomePage() {
         >
           <motion.div className="hero-meta" variants={fadeUp}>
             <span><strong>Mechatronics Engineering @ University of Waterloo</strong></span>
-            <span>·</span>
+            <span className="sep">·</span>
             <span>Ontario, CA</span>
           </motion.div>
 
