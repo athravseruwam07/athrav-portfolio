@@ -98,13 +98,13 @@ const STACK = [
   },
 ];
 
-type Contact = { key: string; val: string; href: string; download?: boolean };
+type Contact = { key: string; val: string; href: string; download?: boolean; newTab?: boolean };
 
 const CONTACTS: Contact[] = [
   { key: 'EMAIL', val: 'athravmk@gmail.com', href: 'mailto:athravmk@gmail.com' },
   { key: 'GITHUB', val: 'github.com/athravseruwam07', href: 'https://github.com/athravseruwam07' },
   { key: 'LINKEDIN', val: 'linkedin.com/in/a-seruwam', href: 'https://linkedin.com/in/a-seruwam/' },
-  { key: 'RESUME', val: 'download pdf', href: '/resume.pdf', download: true },
+  { key: 'RESUME', val: 'view pdf', href: '/resume.pdf', newTab: true },
 ];
 
 /* ---------------- motion variants ---------------- */
@@ -301,8 +301,8 @@ export default function HomePage() {
             <a href="#experience" className="btn primary">
               view work <span className="arrow">→</span>
             </a>
-            <a href="/resume.pdf" download className="btn">
-              download resume
+            <a href="/resume.pdf" target="_blank" rel="noopener noreferrer" className="btn">
+              view resume
             </a>
             <a href="#contact" className="btn">
               get in touch
@@ -490,8 +490,8 @@ export default function HomePage() {
               <a
                 key={c.key}
                 href={c.href}
-                target={c.href.startsWith('http') ? '_blank' : undefined}
-                rel={c.href.startsWith('http') ? 'noopener' : undefined}
+                target={c.href.startsWith('http') || c.newTab ? '_blank' : undefined}
+                rel={c.href.startsWith('http') || c.newTab ? 'noopener' : undefined}
                 {...(c.download ? { download: '' } : {})}
               >
                 <span className="key">{c.key}</span>
