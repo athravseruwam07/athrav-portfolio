@@ -10,13 +10,13 @@ export default function OGImage() {
       <div
         style={{
           fontSize: 64,
-          background: '#0b0d10',
+          background: '#0e1116',
           width: '100%',
           height: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#d8dee4',
+          color: '#e7e0d3',
           fontFamily: 'ui-sans-serif, system-ui',
           letterSpacing: '-0.03em',
         }}

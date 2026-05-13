@@ -19,8 +19,8 @@ const geist = Geist({
   display: 'swap',
 });
 
-const favicon = '/logos/as.png?v=20260506-transparent';
-const faviconIco = '/favicon.ico?v=20260506-transparent';
+const favicon = '/logos/as.png?v=20260513';
+const faviconIco = '/favicon.ico?v=20260513';
 
 export const metadata: Metadata = {
   title: 'Athrav Seruwam — Mechatronics Engineering @ Waterloo',

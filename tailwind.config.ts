@@ -6,22 +6,22 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: '#0b0c10',
-        surface: '#131422',
-        line: '#1f2033',
+        bg: '#0e1116',
+        surface: '#151820',
+        line: '#2b2a27',
         text: {
-          base: '#e5e7eb',
-          muted: '#9ca3af',
+          base: '#e7e0d3',
+          muted: '#9f9689',
         },
-        neon: {
-          from: '#6366f1', // indigo
-          via: '#8b5cf6',  // violet
-          to:   '#ec4899', // pink
+        accent: {
+          DEFAULT: '#c8a45d',
+          soft: 'rgba(200, 164, 93, 0.12)',
+          line: 'rgba(200, 164, 93, 0.28)',
         },
       },
       boxShadow: {
         soft: '0 10px 25px -10px rgba(0,0,0,0.35)',
-        glow: '0 0 0 0 rgba(99,102,241,0)',
+        glow: '0 10px 28px -22px rgba(200,164,93,0.7)',
       },
       backgroundImage: {
         'grid': 'radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px)',
